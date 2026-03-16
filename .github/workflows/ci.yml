@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-# Добавляем permissions
 permissions:
   contents: write
   pages: write
@@ -16,7 +15,6 @@ jobs:
   test-and-build:
     runs-on: ubuntu-latest
 
-    # Добавляем permissions для job
     permissions:
       contents: read
       checks: write
@@ -24,17 +22,16 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18.x, 20.x]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Обновлено до v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4  # Обновлено до v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
@@ -57,33 +54,43 @@ jobs:
           NODE_ENV: production
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Обновлено до v4
         with:
-          name: dist
+          name: dist-${{ matrix.node-version }}
           path: dist/
-          retention-days: 1
+          retention-days: 5
+          if-no-files-found: error
+          compression-level: 6
 
   deploy:
     needs: test-and-build
     if: github.ref == 'refs/heads/main' && success()
     runs-on: ubuntu-latest
 
-    # Добавляем permissions для деплоя
     permissions:
       contents: write
       pages: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/checkout@v4  # Обновлено до v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4  # Обновлено до v4
         with:
-          name: dist
-          path: dist
+          path: dist-artifacts
+          merge-multiple: true
+
+      - name: Prepare deployment files
+        run: |
+          # Найти и скопировать файлы сборки
+          if [ -d "dist-artifacts" ]; then
+            mkdir -p dist
+            cp -r dist-artifacts/* dist/ 2>/dev/null || true
+          fi
+          
+          # Проверить наличие файлов
+          ls -la dist/ || true
 
       - name: Configure Git
         run: |
@@ -98,5 +105,4 @@ jobs:
           publish_branch: gh-pages
           force_orphan: true
           enable_jekyll: false
-          allow_empty_commit: false
           commit_message: 'Deploy: ${{ github.event.head_commit.message }}'
