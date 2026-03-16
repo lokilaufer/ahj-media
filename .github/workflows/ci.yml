@@ -2,12 +2,12 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
 
 jobs:
-  build-and-deploy:
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,13 +23,16 @@ jobs:
         run: npm ci
 
       - name: Run linter
-        run: npm run lint
+        run: npm run lint:ci
+        continue-on-error: false  # Останавливаем сборку при ошибках линтера
 
       - name: Run tests
         run: npm test
 
       - name: Build project
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
