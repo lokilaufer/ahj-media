@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline с геолокацией</title>
+</head>
+<body>
+<div class="container">
+    <h1>Timeline</h1>
+    <div class="timeline" id="timeline"></div>
+
+    <div class="input-container">
+      <textarea
+              id="messageInput"
+              placeholder="Введите сообщение и нажмите Enter..."
+              rows="3"
+      ></textarea>
+    </div>
+
+    <!-- Модальное окно для ввода координат -->
+    <div class="modal" id="coordModal">
+        <div class="modal-content">
+            <h3>Укажите координаты</h3>
+            <p class="error-message" id="errorMessage"></p>
+            <input
+                    type="text"
+                    id="coordInput"
+                    placeholder="Широта и долгота через запятую"
+            >
+            <div class="modal-buttons">
+                <button id="submitCoord">ОК</button>
+                <button id="cancelCoord">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
