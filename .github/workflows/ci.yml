@@ -1,40 +1,15 @@
-name: Build and Deploy
+name: CI
 
-on:
-  push:
-    branches: [ main ]
+on: [push]
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-20.04  # Фиксируем старую версию Ubuntu
-
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2  # Используем старую версию
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2  # Используем старую версию
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Используем старую LTS версию
-
-      - name: Install dependencies
-        run: |
-          npm install
-          npm install --save-dev webpack-cli
-
-      - name: Run tests
-        run: npm test
-        continue-on-error: true  # Не останавливаемся на ошибках тестов
-
-      - name: Build project
-        run: npm run build
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          node-version: 18
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
