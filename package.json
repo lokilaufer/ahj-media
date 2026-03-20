@@ -15,7 +15,6 @@
     "lint:ci": "eslint src/ --max-warnings 0",
     "coverage": "jest --coverage",
     "deploy": "gh-pages -d dist -b gh-pages",
-    "prepare": "husky install",
     "predeploy": "npm run build",
     "validate": "npm run lint && npm test && npm run build"
   },
