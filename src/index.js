@@ -1,6 +1,10 @@
 import './css/style.css';
-import { App } from './js/app';
+import App from './js/app';
 
 document.addEventListener('DOMContentLoaded', () => {
-  new App();
+  try {
+    new App();
+  } catch (error) {
+    console.error('Failed to initialize app:', error);
+  }
 });

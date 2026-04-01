@@ -1,4 +1,5 @@
-import { parseCoordinates } from './geolocation';
+// src/js/modal.js
+import { parseCoordinates } from './coordinates';  // Убрали utils/
 
 export class CoordinatesModal {
   constructor(onSubmit, onCancel) {
@@ -15,28 +16,51 @@ export class CoordinatesModal {
   }
 
   bindEvents() {
-    this.submitBtn.addEventListener('click', () => this.handleSubmit());
-    this.cancelBtn.addEventListener('click', () => this.handleCancel());
-    this.input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.handleSubmit();
-      }
-    });
+    if (this.submitBtn) {
+      this.submitBtn.addEventListener('click', () => this.handleSubmit());
+    }
+    if (this.cancelBtn) {
+      this.cancelBtn.addEventListener('click', () => this.handleCancel());
+    }
+    if (this.input) {
+      this.input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.handleSubmit();
+        }
+      });
+      this.input.addEventListener('input', () => this.clearError());
+    }
   }
 
   show() {
-    this.modal.classList.add('show');
-    this.input.value = '';
-    this.errorMessage.textContent = '';
-    this.input.classList.remove('error');
-    this.input.focus();
+    if (this.modal) {
+      this.modal.style.display = 'flex';
+    }
+    if (this.input) {
+      this.input.value = '';
+      this.clearError();
+      setTimeout(() => this.input.focus(), 100);
+    }
   }
 
   hide() {
-    this.modal.classList.remove('show');
+    if (this.modal) {
+      this.modal.style.display = 'none';
+    }
+  }
+
+  clearError() {
+    if (this.errorMessage) {
+      this.errorMessage.textContent = '';
+    }
+    if (this.input) {
+      this.input.classList.remove('error');
+    }
   }
 
   handleSubmit() {
+    if (!this.input) return;
+
     try {
       const coordinates = parseCoordinates(this.input.value);
       this.hide();
@@ -44,8 +68,12 @@ export class CoordinatesModal {
         this.onSubmit(coordinates);
       }
     } catch (error) {
-      this.errorMessage.textContent = error.message;
-      this.input.classList.add('error');
+      if (this.errorMessage) {
+        this.errorMessage.textContent = error.message;
+      }
+      if (this.input) {
+        this.input.classList.add('error');
+      }
     }
   }
 
